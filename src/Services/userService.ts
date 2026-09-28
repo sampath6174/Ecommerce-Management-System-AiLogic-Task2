@@ -65,6 +65,23 @@ const refreshToken = this.tokenService.generateRefreshToken(
 
     return {accessToken,refreshToken};
 }
+async deleteUser(userId: number) {
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (user.role === "ADMIN") {
+        throw new Error("Admin cannot be deleted");
+    }
+
+    await user.destroy();
+
+    return {
+        message: "User deleted successfully"
+    };
+}
 }
 
 export default UserService;
