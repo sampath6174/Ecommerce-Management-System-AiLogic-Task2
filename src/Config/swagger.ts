@@ -8,7 +8,15 @@ const swaggerOptions = {
             title: "E-Commerce Management System API",
             version: "1.0.0",
             description: "API documentation for the E-Commerce Management System"
+        },components: {
+    securitySchemes: {
+        bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT"
         }
+    }
+}
     },
     apis: ["./src/Routes/*.ts"]
 };
