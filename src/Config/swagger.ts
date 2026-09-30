@@ -1,6 +1,5 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-
 const swaggerOptions = {
     definition: {
         openapi: "3.0.0",
@@ -18,9 +17,8 @@ const swaggerOptions = {
     }
 }
     },
-    apis: ["./src/Routes/*.ts"]
+    apis: ["./src/Docs/*.ts","./src/productDocs/*.ts","./src/orderDocs/*.ts"]
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
-
 export { swaggerSpec, swaggerUi };

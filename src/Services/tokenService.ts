@@ -16,6 +16,13 @@ class TokenService {
             { expiresIn: "7d" }
         );
     }
+
+    verifyRefreshToken(refreshToken: string) {
+    return jwt.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET as string
+    ) as { userId: number };
+}
 }
 
 export default TokenService;

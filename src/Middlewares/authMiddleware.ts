@@ -13,8 +13,8 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
         const decoded = jwt.verify(
             token,
             process.env.JWT_ACCESS_SECRET as string
-        );
-        (req as any).user = decoded;
+        ) as {userId : number,role:string}
+        req.user = decoded;
         next();
     }
     catch (error) {

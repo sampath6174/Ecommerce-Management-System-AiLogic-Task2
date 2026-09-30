@@ -65,6 +65,24 @@ class UserService {
 
         return { accessToken, refreshToken };
     }
+    async refreshAccessToken(refreshToken: string) {
+    const decoded = this.tokenService.verifyRefreshToken(refreshToken);
+
+    const user = await User.findByPk(decoded.userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const accessToken = this.tokenService.generateAccessToken(
+        user.id,
+        user.role
+    );
+
+    return {
+        accessToken
+    };
+} 
     async deleteUser(targetUserId: number, requestingUserId: number) {
         const targetUser = await User.findByPk(targetUserId);
         const requestingUser = await User.findByPk(requestingUserId);

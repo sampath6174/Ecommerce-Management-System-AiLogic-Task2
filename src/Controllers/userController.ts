@@ -1,74 +1,164 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import UserService from "../Services/userService";
+
+interface RegisterRequest {
+    name: string;
+    email: string;
+    username: string;
+    password: string;
+}
+
+interface LoginRequest {
+    username?: string;
+    email?: string;
+    password: string;
+}
+
+interface CreateUserRequest {
+    name: string;
+    email: string;
+    username: string;
+    password: string;
+}
 
 class UserController {
     private userService = new UserService()
-    async register(req: Request, res: Response) {
-        const { name, email, username, password } = req.body
-        const user = await this.userService.registerCustomer(name, email, username, password)
-        return res.status(201).send("User Registered successfully")
+
+    // Register
+    async register(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { name, email, username, password } = req.body as RegisterRequest
+            const user = await this.userService.registerCustomer(name, email, username, password)
+            return res.status(201).send("User Registered successfully")
+        } catch (error) {
+            next(error)
+        }
     }
-    async login(req: Request, res: Response) {
-        const { username,email, password } = req.body;
 
-        const tokens = await this.userService.loginUser(
-            username,
-            email,
-            password
-        );
 
-        return res.status(200).json({message:"Login successful", ...tokens});
+    // LOGIN
+    async login(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            const { username, email, password } = req.body;
+
+            const tokens = await this.userService.loginUser(
+                username,
+                email,
+                password
+            );
+
+            return res.status(200).json({
+                message: "Login successful",
+                ...tokens
+            });
+        } catch (error) {
+            next(error);
+        }
     }
-    async deleteUser(req: Request, res: Response) {
-    const targetUserId = Number(req.params.id);
-    const requestingUserId = (req as any).user.userId
+    // REFRESH ACCESS TOKEN
+    async refreshAccessToken(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            const { refreshToken } = req.body;
 
-    const result = await this.userService.deleteUser(targetUserId,requestingUserId);
+            const result = await this.userService.refreshAccessToken(
+                refreshToken
+            );
 
-    return res.status(200).send(result);
-}
+            return res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
 
-async getAllUsers(req: Request, res: Response) {
-    const users = await this.userService.getAllUsers();
-    return res.status(200).json(users);
-}
 
-async getUserById(req: Request, res: Response) {
-    const userId = Number(req.params.id);
+    // DELETE USER
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const targetUserId = Number(req.params.id);
+            const requestingUserId = (req as any).user.userId
 
-    const user = await this.userService.getUserById(userId);
+            const result = await this.userService.deleteUser(targetUserId, requestingUserId);
 
-    return res.status(200).json(user);
-}
+            return res.status(200).send(result);
+        } catch (error) {
+            next(error)
+        }
+    }
 
-async getAllCustomers(req: Request, res: Response) {
-    const customers = await this.userService.getAllCustomers();
+    // GET ALL USERS
+    async getAllUsers(req: Request, res: Response, next: NextFunction) {
+        try {
+            const users = await this.userService.getAllUsers();
+            return res.status(200).json(users);
+        } catch (error) {
+            next(error)
+        }
+    }
 
-    return res.status(200).json(customers);
-}
+    // GET USER BY ID
+    async getUserById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = Number(req.params.id);
 
-async getCustomerById(req: Request, res: Response) {
-    const customerId = Number(req.params.id);
+            const user = await this.userService.getUserById(userId);
 
-    const customer = await this.userService.getCustomerById(customerId);
+            return res.status(200).json(user);
+        } catch (error) {
+            next(error)
+        }
+    }
 
-    return res.status(200).json(customer);
-}
+    // GET ALL CUSTOMERS
+    async getAllCustomers(req: Request, res: Response, next: NextFunction) {
+        try {
+            const customers = await this.userService.getAllCustomers();
 
-async createUser(req: Request, res: Response) {
-    const { name, email, username, password } = req.body;
+            return res.status(200).json(customers);
+        } catch (error) {
+            next(error)
+        }
+    }
 
-    const user = await this.userService.createUser(
-        name,
-        email,
-        username,
-        password
-    );
+    // GET CUSTOMER BY ID
+    async getCustomerById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const customerId = Number(req.params.id);
 
-    return res.status(201).send(
-        "User created successfully"
-    );
-}
+            const customer = await this.userService.getCustomerById(customerId);
+
+            return res.status(200).json(customer);
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    // CREATE NEW USER
+    async createUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { name, email, username, password } = req.body as CreateUserRequest;
+
+            const user = await this.userService.createUser(
+                name,
+                email,
+                username,
+                password
+            );
+
+            return res.status(201).send(
+                "User created successfully"
+            );
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 
