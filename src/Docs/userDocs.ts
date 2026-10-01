@@ -168,9 +168,9 @@
 
 /**
  * @swagger
- * /api/users:
+ * /api/users/create/staff:
  *   post:
- *     summary: Create a new user
+ *     summary: Create a new staff
  *     tags:
  *       - Users
  *     security:
@@ -189,7 +189,7 @@
  *             properties:
  *               name:
  *                 type: string
- *                 example: John
+ *                 example: John1
  *               email:
  *                 type: string
  *                 example: john@example.com
@@ -201,7 +201,7 @@
  *                 example: John@123
  *     responses:
  *       201:
- *         description: User created successfully
+ *         description: Staff created successfully
  *       401:
  *         description: Authentication required
  *       403:
@@ -233,4 +233,22 @@
  *         description: New access token generated successfully
  *       401:
  *         description: Invalid or expired refresh token
+ */
+/**
+ * @swagger
+ * /api/users/staff:
+ *   get:
+ *     summary: Get all staff users
+ *     description: Returns all users with the USER role. Accessible only to Admin.
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Staff users retrieved successfully
+ *       401:
+ *         description: Authentication required
+ *       403:
+ *         description: Access denied
  */

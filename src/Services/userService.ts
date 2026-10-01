@@ -137,7 +137,7 @@ class UserService {
             }
         });
     }
-    async createUser(
+    async createStaff(
     name: string,
     email: string,
     username: string,
@@ -170,6 +170,12 @@ class UserService {
     });
 
     return user;
+}
+
+async getAllStaffUsers() {
+    return await User.findAll({
+        where: { role: "USER" }
+    });
 }
 }
 

@@ -14,7 +14,7 @@ interface LoginRequest {
     password: string;
 }
 
-interface CreateUserRequest {
+interface CreateStaffRequest {
     name: string;
     email: string;
     username: string;
@@ -141,11 +141,11 @@ class UserController {
     }
 
     // CREATE NEW USER
-    async createUser(req: Request, res: Response, next: NextFunction) {
+    async createStaff(req: Request, res: Response, next: NextFunction) {
         try {
-            const { name, email, username, password } = req.body as CreateUserRequest;
+            const { name, email, username, password } = req.body as CreateStaffRequest;
 
-            const user = await this.userService.createUser(
+            const user = await this.userService.createStaff(
                 name,
                 email,
                 username,
@@ -153,12 +153,26 @@ class UserController {
             );
 
             return res.status(201).send(
-                "User created successfully"
+                "Staff member created successfully"
             );
         } catch (error) {
             next(error)
         }
     }
+
+    async getAllStaffUsers(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    try {
+        const users = await this.userService.getAllStaffUsers();
+
+        return res.status(200).json(users);
+    } catch (error) {
+        next(error);
+    }
+}
 }
 
 

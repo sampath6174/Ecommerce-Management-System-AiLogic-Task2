@@ -43,5 +43,11 @@ router.get(
     roleMiddleware(["ADMIN", "USER"]),
     orderController.getOrderById.bind(orderController)
 );
+router.put(
+    "/:id/status",
+    authMiddleware,
+    roleMiddleware(["ADMIN", "USER"]),
+    orderController.updateOrderStatus.bind(orderController)
+);
 
 export default router;

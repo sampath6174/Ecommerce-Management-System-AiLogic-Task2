@@ -3,6 +3,8 @@ import Product from "../Models/productModel";
 
 class OrderService {
 
+
+    // creating order
     async createOrder(
         customerId: number,
         productId: number,
@@ -32,10 +34,12 @@ class OrderService {
         return order;
     }
 
+    // getting all orders
     async getAllOrders() {
         return await Order.findAll();
     }
 
+    // getting order details by their id
     async getOrderById(orderId: number) {
         const order = await Order.findByPk(orderId);
 
@@ -46,6 +50,7 @@ class OrderService {
         return order;
     }
 
+    // getting thier own orders details
     async getCustomerOrders(customerId: number) {
         return await Order.findAll({
             where: {

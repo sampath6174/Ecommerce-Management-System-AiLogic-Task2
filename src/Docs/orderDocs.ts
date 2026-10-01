@@ -86,3 +86,47 @@
  *       404:
  *         description: Order not found
  */
+
+/**
+ * @swagger
+ * /api/orders/{id}/status:
+ *   put:
+ *     summary: Update order status
+ *     tags:
+ *       - Orders
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Order ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum:
+ *                   - CONFIRMED
+ *                   - PROCESSING
+ *                   - SHIPPED
+ *                   - DELIVERED
+ *                   - CANCELLED
+ *     responses:
+ *       200:
+ *         description: Order status updated successfully
+ *       401:
+ *         description: Authentication required
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Order not found
+ */
