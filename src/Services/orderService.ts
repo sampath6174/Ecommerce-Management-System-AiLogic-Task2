@@ -1,5 +1,6 @@
 import Order from "../Models/orderModel";
 import Product from "../Models/productModel";
+import { addOrderJob } from "./orderQueue";
 
 class OrderService {
 
@@ -30,6 +31,7 @@ class OrderService {
 
         product.stock = product.stock - quantity;
         await product.save();
+        await addOrderJob(order.id);
 
         return order;
     }

@@ -1,5 +1,6 @@
 // BUSINESS LOGICS
 import Product from "../Models/productModel";
+import redisClient from "../Config/redis";
 
 class ProductService {
 
@@ -27,14 +28,36 @@ class ProductService {
     }
     // get product by their id
     async getProductById(productId: number) {
-        const product = await Product.findByPk(productId);
 
-        if (!product) {
-            throw new Error("Product not found");
-        }
+    const cacheKey = `product:${productId}`;
 
-        return product;
+    const cachedProduct = await redisClient.get(cacheKey);
+
+    if (cachedProduct) {
+        console.log("Product found in Redis");
+        return JSON.parse(cachedProduct);
     }
+
+    console.log("Product not found in Redis");
+
+    const product = await Product.findByPk(productId);
+
+    if (!product) {
+        throw new Error("Product not found");
+    }
+
+    const productData = product.toJSON();
+
+    await redisClient.setEx(
+        cacheKey,
+        60,
+        JSON.stringify(productData)
+    );
+
+    console.log("Product stored in Redis");
+
+    return productData;
+}
 
     // updating product info only admin&user
     async updateProduct(
@@ -56,6 +79,7 @@ class ProductService {
             price,
             stock
         });
+        await redisClient.del(`product:${productId}`);
 
         return product;
     }
@@ -69,6 +93,7 @@ class ProductService {
         }
 
         await product.destroy();
+        await redisClient.del(`product:${productId}`);
 
         return {
             message: "Product deleted successfully"
