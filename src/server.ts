@@ -1,10 +1,25 @@
+import { createServer } from "http";
+import { Server } from "socket.io";
 import app from "./app";
 import dotenv from "dotenv";
 import sequelize from "./Config/database";
 import redisClient from "./Config/redis";
 import "./Services/orderWorker";
+import "./cronJob";
 dotenv.config();
 const PORT = process.env.PORT || 5000
+
+const httpServer = createServer(app);
+
+const io = new Server(httpServer);
+
+io.on("connection", (socket) => {
+    console.log("Client connected:", socket.id);
+
+    socket.on("disconnect", () => {
+        console.log("Client disconnected:", socket.id);
+    });
+});
 
 sequelize.authenticate()
     .then(async () => {
@@ -13,7 +28,7 @@ sequelize.authenticate()
             await redisClient.connect();
             console.log("redis connected successfully")
 
-            app.listen(PORT, () => {
+            httpServer.listen(PORT, () => {
                 console.log(`Server is running on ${PORT}`)
             })
 
