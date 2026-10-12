@@ -3,7 +3,7 @@ import Order from "./Models/orderModel";
 
 console.log("cronJob.ts loaded");
 
-cron.schedule(" * * * * *", async () => {
+cron.schedule("* * * * *", async () => {
     console.log("Cron job is running");
 
     const pendingOrders = await Order.count({

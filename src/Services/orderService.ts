@@ -1,6 +1,7 @@
 import Order from "../Models/orderModel";
 import Product from "../Models/productModel";
 import { addOrderJob } from "./orderQueue";
+import { emitNewOrder } from "../Config/socket";
 
 class OrderService {
 
@@ -27,6 +28,10 @@ class OrderService {
             customerId,
             totalAmount,
             status: "PENDING"
+        });
+        emitNewOrder({
+            id: order.id,
+            status: order.status
         });
 
         product.stock = product.stock - quantity;
@@ -64,43 +69,43 @@ class OrderService {
 
     // ORDER STATUS UPDATE
     async updateOrderStatus(
-    orderId: number,
-    newStatus:
-        | "CONFIRMED"
-        | "PROCESSING"
-        | "SHIPPED"
-        | "DELIVERED"
-        | "CANCELLED"
-) {
-    const order = await Order.findByPk(orderId);
+        orderId: number,
+        newStatus:
+            | "CONFIRMED"
+            | "PROCESSING"
+            | "SHIPPED"
+            | "DELIVERED"
+            | "CANCELLED"
+    ) {
+        const order = await Order.findByPk(orderId);
 
-    if (!order) {
-        throw new Error("Order not found");
+        if (!order) {
+            throw new Error("Order not found");
+        }
+
+        const allowedTransitions: {
+            [key: string]: string[];
+        } = {
+            PENDING: ["CONFIRMED", "CANCELLED"],
+            CONFIRMED: ["PROCESSING", "CANCELLED"],
+            PROCESSING: ["SHIPPED"],
+            SHIPPED: ["DELIVERED"],
+            DELIVERED: [],
+            CANCELLED: []
+        };
+
+        if (!allowedTransitions[order.status].includes(newStatus)) {
+            throw new Error(
+                `Cannot change order status from ${order.status} to ${newStatus}`
+            );
+        }
+
+        order.status = newStatus;
+
+        await order.save();
+
+        return order;
     }
-
-    const allowedTransitions: {
-        [key: string]: string[];
-    } = {
-        PENDING: ["CONFIRMED", "CANCELLED"],
-        CONFIRMED: ["PROCESSING", "CANCELLED"],
-        PROCESSING: ["SHIPPED"],
-        SHIPPED: ["DELIVERED"],
-        DELIVERED: [],
-        CANCELLED: []
-    };
-
-    if (!allowedTransitions[order.status].includes(newStatus)) {
-        throw new Error(
-            `Cannot change order status from ${order.status} to ${newStatus}`
-        );
-    }
-
-    order.status = newStatus;
-
-    await order.save();
-
-    return order;
-}
 }
 
 export default OrderService;

@@ -1,5 +1,5 @@
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { initializeSocket } from "./Config/socket";
 import app from "./app";
 import dotenv from "dotenv";
 import sequelize from "./Config/database";
@@ -11,15 +11,7 @@ const PORT = process.env.PORT || 5000
 
 const httpServer = createServer(app);
 
-const io = new Server(httpServer);
-
-io.on("connection", (socket) => {
-    console.log("Client connected:", socket.id);
-
-    socket.on("disconnect", () => {
-        console.log("Client disconnected:", socket.id);
-    });
-});
+initializeSocket(httpServer);
 
 sequelize.authenticate()
     .then(async () => {
